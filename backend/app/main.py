@@ -19,12 +19,12 @@ load_dotenv()
 
 app = FastAPI()
 
-# CORS FIX
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "https://skeleton-website-project-ebsz2m1aw-kellenwynn06s-projects.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -40,8 +40,6 @@ SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev-secret")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-
-# ---------- SCHEMAS ----------
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -76,8 +74,6 @@ class ProjectUpdate(BaseModel):
     notes: str | None = None
 
 
-# ---------- DB DEP ----------
-
 def get_db():
     db = SessionLocal()
     try:
@@ -85,8 +81,6 @@ def get_db():
     finally:
         db.close()
 
-
-# ---------- AUTH HELPERS ----------
 
 def hash_password(password: str):
     return pwd_context.hash(password)
@@ -126,8 +120,6 @@ def get_current_user(
     return user
 
 
-# ---------- BASIC ROUTES ----------
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -142,8 +134,6 @@ def db_test():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-
-# ---------- AUTH ROUTES ----------
 
 @app.post("/auth/register")
 def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
@@ -185,8 +175,6 @@ def login_user(user_data: UserLogin, db: Session = Depends(get_db)):
         "token_type": "bearer"
     }
 
-
-# ---------- PROFILE ROUTES ----------
 
 @app.get("/profile/me")
 def get_my_profile(
@@ -240,8 +228,6 @@ def update_my_profile(
         "bio": profile.bio
     }
 
-
-# ---------- PROJECT ROUTES ----------
 
 @app.post("/projects")
 def create_project(
